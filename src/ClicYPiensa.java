@@ -2,6 +2,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import java.awt.BorderLayout; 
 
 public class ClicYPiensa {
     public static void main(String[] args) {
@@ -17,7 +20,15 @@ public class ClicYPiensa {
                 SwingConstants.CENTER
             );
 
-            ventana.add(titulo);
+            JButton botonIngresar = new JButton("Ingresar");
+            JButton botonRegistrarse = new JButton("Registrarse");
+
+            JPanel panelBotones = new JPanel();
+            panelBotones.add(botonIngresar);
+            panelBotones.add(botonRegistrarse);
+          
+            ventana.add(titulo, BorderLayout.CENTER);
+            ventana.add(panelBotones, BorderLayout.SOUTH);
             ventana.setVisible(true);
         });
     }
