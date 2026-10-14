@@ -1,3 +1,4 @@
+
 package vista;
 
 import java.awt.BorderLayout;
@@ -8,6 +9,9 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 public class VentanaInicio extends JFrame {
+
+    private JButton botonIngresar;
+    private JButton botonRegistrarse;
 
     public VentanaInicio() {
         super("Clic y piensa");
@@ -21,14 +25,8 @@ public class VentanaInicio extends JFrame {
             SwingConstants.CENTER
         );
 
-        JButton botonIngresar = new JButton("Ingresar");
-        JButton botonRegistrarse = new JButton("Registrarse");
-
-        // Al pulsar Ingresar, se crea y muestra el formulario.
-        botonIngresar.addActionListener(evento -> {
-            VentanaIngreso ingreso = new VentanaIngreso(this);
-            ingreso.setVisible(true);
-        });
+        botonIngresar = new JButton("Ingresar");
+        botonRegistrarse = new JButton("Registrarse");
 
         JPanel panelBotones = new JPanel();
         panelBotones.add(botonIngresar);
@@ -36,5 +34,13 @@ public class VentanaInicio extends JFrame {
 
         add(titulo, BorderLayout.CENTER);
         add(panelBotones, BorderLayout.SOUTH);
+    }
+
+    public JButton getBotonIngresar() {
+        return botonIngresar;
+    }
+
+    public JButton getBotonRegistrarse() {
+        return botonRegistrarse;
     }
 }
