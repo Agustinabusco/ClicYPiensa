@@ -2,12 +2,14 @@ package vista;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -39,10 +41,8 @@ public class RegistroVista extends JDialog {
 
         panelCampos.add(new JLabel("Usuario:"));
         panelCampos.add(campoUsuario);
-
         panelCampos.add(new JLabel("Contraseña:"));
         panelCampos.add(campoContrasena);
-
         panelCampos.add(new JLabel("Rol:"));
         panelCampos.add(selectorRol);
 
@@ -63,5 +63,29 @@ public class RegistroVista extends JDialog {
         setContentPane(panelPrincipal);
         pack();
         setLocationRelativeTo(ventanaPadre);
+    }
+
+    public String getNombreUsuario() {
+        return campoUsuario.getText().trim();
+    }
+
+    public char[] getContrasena() {
+        return campoContrasena.getPassword();
+    }
+
+    public String getRol() {
+        return (String) selectorRol.getSelectedItem();
+    }
+
+    public void agregarAccionRegistrar(ActionListener accion) {
+        botonRegistrar.addActionListener(accion);
+    }
+
+    public void mostrarMensaje(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje);
+    }
+
+    public void limpiarContrasena() {
+        campoContrasena.setText("");
     }
 }

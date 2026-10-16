@@ -10,8 +10,8 @@ import javax.swing.SwingConstants;
 
 public class VentanaInicio extends JFrame {
 
-    private JButton botonIngresar;
-    private JButton botonRegistrarse;
+    private final JButton botonIngresar;
+    private final JButton botonRegistrarse;
 
     public VentanaInicio() {
         super("Clic y piensa");
