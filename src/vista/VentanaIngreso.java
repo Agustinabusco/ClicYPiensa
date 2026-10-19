@@ -2,11 +2,13 @@ package vista;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -17,6 +19,7 @@ public class VentanaIngreso extends JDialog {
     private final JPasswordField campoContrasena;
     private final JButton botonIngresar;
 
+    // Constructor: prepara el formulario.
     public VentanaIngreso(JFrame ventanaPadre) {
         super(ventanaPadre, "Ingresar — Clic y piensa", true);
 
@@ -52,5 +55,30 @@ public class VentanaIngreso extends JDialog {
         setContentPane(panelPrincipal);
         pack();
         setLocationRelativeTo(ventanaPadre);
+    }
+
+    // Devuelve el usuario sin espacios en los extremos.
+    public String getNombreUsuario() {
+        return campoUsuario.getText().trim();
+    }
+
+    // Devuelve la contraseña como arreglo de caracteres.
+    public char[] getContrasena() {
+        return campoContrasena.getPassword();
+    }
+
+    // Permite al controlador conectar la acción del botón.
+    public void agregarAccionIngresar(ActionListener accion) {
+        botonIngresar.addActionListener(accion);
+    }
+
+    // Muestra un mensaje en un cuadro de diálogo.
+    public void mostrarMensaje(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje);
+    }
+
+    // Vacía el campo de contraseña.
+    public void limpiarContrasena() {
+        campoContrasena.setText("");
     }
 }

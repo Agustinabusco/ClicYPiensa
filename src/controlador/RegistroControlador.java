@@ -1,15 +1,19 @@
 package controlador;
 
+import java.io.IOException;
 import java.util.Arrays;
 import modelo.Usuario;
+import persistencia.UsuariosJson;
 import vista.RegistroVista;
 
 public class RegistroControlador {
 
     private final RegistroVista vista;
+    private final UsuariosJson persistencia;
 
     public RegistroControlador(RegistroVista vista) {
         this.vista = vista;
+        this.persistencia = new UsuariosJson();
 
         vista.agregarAccionRegistrar(evento -> registrar());
     }
@@ -42,14 +46,27 @@ public class RegistroControlador {
                 return;
             }
 
-            Usuario usuario = new Usuario(nombre, rol);
+            Usuario usuario = new Usuario(
+                nombre,
+                rol,
+                contrasena
+            );
+
+            persistencia.guardarUsuario(usuario);
 
             vista.mostrarMensaje(
-                "Datos válidos para "
-                + usuario.getNombreUsuario()
-                + " con rol "
-                + usuario.getRol()
-                + ". La cuenta todavía no se guardó."
+                "Cuenta registrada correctamente."
+            );
+
+            vista.dispose();
+
+        } catch (IllegalArgumentException error) {
+            vista.mostrarMensaje(error.getMessage());
+
+        } catch (IOException | IllegalStateException error) {
+            vista.mostrarMensaje(
+                "No se pudo registrar la cuenta: "
+                + error.getMessage()
             );
 
         } finally {

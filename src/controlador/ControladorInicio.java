@@ -14,6 +14,7 @@ public class ControladorInicio {
         // Acción del botón Ingresar.
         this.vista.getBotonIngresar().addActionListener(evento -> {
             VentanaIngreso ingreso = new VentanaIngreso(this.vista);
+            new IngresoControlador(ingreso);
             ingreso.setVisible(true);
         });
 
