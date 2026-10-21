@@ -13,22 +13,28 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+// Formulario de ingreso asociado a la ventana principal.
 public class VentanaIngreso extends JDialog {
 
     private final JTextField campoUsuario;
     private final JPasswordField campoContrasena;
     private final JButton botonIngresar;
 
-    // Constructor: prepara el formulario.
+    
     public VentanaIngreso(JFrame ventanaPadre) {
+        // Establece propietario, título y modalidad:
+        // bloquea la interacción con la ventana principal mientras está abierto.
         super(ventanaPadre, "Ingresar — Clic y piensa", true);
 
+        // Cierra el diálogo sin terminar la aplicación.
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
+        // Crea los campos y el botón. El 20 indica columnas de ancho preferido.
         campoUsuario = new JTextField(20);
         campoContrasena = new JPasswordField(20);
         botonIngresar = new JButton("Ingresar");
 
+        // Organiza etiquetas y campos en dos filas y dos columnas.
         JPanel panelCampos = new JPanel(
             new GridLayout(2, 2, 10, 10)
         );
@@ -38,9 +44,11 @@ public class VentanaIngreso extends JDialog {
         panelCampos.add(new JLabel("Contraseña:"));
         panelCampos.add(campoContrasena);
 
+        // Agrupa el botón en su propio panel.
         JPanel panelBotones = new JPanel();
         panelBotones.add(botonIngresar);
 
+        // Prepara el contenedor principal con separaciones y márgenes.
         JPanel panelPrincipal = new JPanel(
             new BorderLayout(10, 10)
         );
@@ -52,6 +60,7 @@ public class VentanaIngreso extends JDialog {
         panelPrincipal.add(panelCampos, BorderLayout.CENTER);
         panelPrincipal.add(panelBotones, BorderLayout.SOUTH);
 
+        // Establece el contenido, ajusta el tamaño y centra el diálogo.
         setContentPane(panelPrincipal);
         pack();
         setLocationRelativeTo(ventanaPadre);
@@ -72,7 +81,7 @@ public class VentanaIngreso extends JDialog {
         botonIngresar.addActionListener(accion);
     }
 
-    // Muestra un mensaje en un cuadro de diálogo.
+    // Muestra los mensajes solicitados por el controlador.
     public void mostrarMensaje(String mensaje) {
         JOptionPane.showMessageDialog(this, mensaje);
     }
