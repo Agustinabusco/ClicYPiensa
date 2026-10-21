@@ -5,29 +5,30 @@ import java.util.Arrays;
 import modelo.Usuario;
 import persistencia.UsuariosJson;
 import vista.VentanaIngreso;
+import vista.VentanaCuestionario;
 
-// Coordina la comprobación de las credenciales ingresadas.
+// Comprueba las credenciales y abre el cuestionario.
 public class IngresoControlador {
 
     private final VentanaIngreso vista;
     private final UsuariosJson persistencia;
 
     public IngresoControlador(VentanaIngreso vista) {
-        // Guarda la vista y prepara el acceso al archivo JSON.
+        // Guarda la vista y prepara el acceso a los usuarios.
         this.vista = vista;
         this.persistencia = new UsuariosJson();
 
-        // Ejecuta ingresar() al presionar el botón Ingresar.
+        // Ejecuta ingresar() al presionar el botón.
         vista.agregarAccionIngresar(evento -> ingresar());
     }
 
     private void ingresar() {
-        // Obtiene el nombre y la contraseña del formulario.
+        // Obtiene los datos escritos en el formulario.
         String nombre = vista.getNombreUsuario();
         char[] contrasena = vista.getContrasena();
 
         try {
-            // Detiene el ingreso si alguno de los campos está vacío.
+            // Comprueba que ambos campos estén completos.
             if (nombre.isEmpty() || contrasena.length == 0) {
                 vista.mostrarMensaje(
                     "Completá el usuario y la contraseña."
@@ -35,7 +36,7 @@ public class IngresoControlador {
                 return;
             }
 
-            // Recupera las cuentas del JSON y las recorre una por una.
+            // Recupera las cuentas y busca una coincidencia.
             for (Usuario usuario : persistencia.cargarUsuarios()) {
 
                 // Compara los nombres sin distinguir mayúsculas y minúsculas.
@@ -43,45 +44,49 @@ public class IngresoControlador {
                     usuario.getNombreUsuario()
                         .equalsIgnoreCase(nombre);
 
-                // Si el nombre coincide, comprueba también la contraseña.
+                // Comprueba la contraseña si el nombre coincide.
                 if (coincideNombre
                         && usuario.verificarContrasena(contrasena)) {
 
-                    // Muestra la bienvenida con el nombre y el rol.
-                    vista.mostrarMensaje(
-                        "Bienvenido/a, "
-                        + usuario.getNombreUsuario()
-                        + ". Rol: "
-                        + usuario.getRol()
+                    // Cierra el formulario de ingreso.
+                    vista.dispose();
+
+                    // Crea la ventana del cuestionario.
+                    VentanaCuestionario cuestionario =
+                        new VentanaCuestionario();
+
+                    // Conecta el controlador y le pasa el usuario del intento.
+                    new CuestionarioControlador(
+                        cuestionario,
+                        usuario.getNombreUsuario()
                     );
 
-                    // Cierra el formulario y termina el método.
-                    vista.dispose();
+                    // Muestra el cuestionario y termina la búsqueda.
+                    cuestionario.setVisible(true);
                     return;
                 }
             }
 
-            // Se muestra si ninguna cuenta coincide con las credenciales.
+            // Informa que no se encontró una cuenta con esos datos.
             vista.mostrarMensaje(
                 "Usuario o contraseña incorrectos."
             );
 
         } catch (IOException | IllegalStateException error) {
-            // Informa problemas de lectura o de procesamiento de la contraseña.
+            // Informa problemas de lectura o procesamiento de la contraseña.
             vista.mostrarMensaje(
                 "No se pudo comprobar el ingreso: "
                 + error.getMessage()
             );
 
         } catch (IllegalArgumentException error) {
-            // Informa si la sal o el hash guardados tienen un formato inválido.
+            // Informa si los datos de la contraseña tienen un formato inválido.
             vista.mostrarMensaje(
                 "La cuenta contiene datos de contraseña inválidos."
             );
 
         } finally {
-            // Limpia la contraseña del arreglo y del campo,
-            // incluso si hubo un error o se ejecutó un return.
+            // Limpia la contraseña, incluso si hubo un error o un return.
             Arrays.fill(contrasena, '\0');
             vista.limpiarContrasena();
         }
