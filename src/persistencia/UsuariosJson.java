@@ -14,43 +14,37 @@ import java.util.Arrays;
 import java.util.List;
 import modelo.Usuario;
 
-// Lee y guarda usuarios en un archivo JSON.
+// Lee y guarda las cuentas.
 public class UsuariosJson {
 
-    // Ruta relativa al directorio donde se ejecuta el programa.
     private final Path archivo = Path.of("datos", "usuarios.json");
 
-    // Configura Gson para escribir JSON con sangrías y saltos de línea.
     private final Gson gson = new GsonBuilder()
         .setPrettyPrinting()
         .create();
 
-    // Recupera los usuarios. Informa problemas de lectura mediante IOException.
     public List<Usuario> cargarUsuarios() throws IOException {
 
-        // Si el archivo no existe, devuelve una lista vacía.
+        // Sin archivo, todavía no hay cuentas registradas.
         if (!Files.exists(archivo)) {
             return new ArrayList<>();
         }
 
-        // Abre el archivo con UTF-8 y cierra el lector automáticamente.
+        // Lee el JSON y cierra el lector automáticamente.
         try (Reader lector = Files.newBufferedReader(
                 archivo, StandardCharsets.UTF_8)) {
 
-            // Convierte el contenido JSON en un arreglo de objetos Usuario.
             Usuario[] usuarios = gson.fromJson(
-                lector,
-                Usuario[].class
+                lector, Usuario[].class
             );
 
-            // Rechaza un archivo vacío o un contenido JSON igual a null.
             if (usuarios == null) {
                 throw new IOException(
-                    "El archivo de usuarios debe contener un arreglo JSON."
+                    "El archivo debe contener una lista de usuarios."
                 );
             }
 
-            // Comprueba que cada usuario tenga nombre y rol.
+            // Evita cargar cuentas incompletas.
             for (Usuario usuario : usuarios) {
                 if (usuario == null
                         || usuario.getNombreUsuario() == null
@@ -62,11 +56,9 @@ public class UsuariosJson {
                 }
             }
 
-            // Convierte el arreglo en una lista que permite agregar elementos.
             return new ArrayList<>(Arrays.asList(usuarios));
 
         } catch (JsonParseException error) {
-            // Comunica un problema de formato conservando su causa original.
             throw new IOException(
                 "El archivo de usuarios tiene un formato inválido.",
                 error
@@ -74,14 +66,13 @@ public class UsuariosJson {
         }
     }
 
-    // Agrega un usuario y guarda la lista actualizada.
     public void guardarUsuario(Usuario nuevoUsuario)
             throws IOException {
 
-        // Recupera los usuarios existentes para conservarlos.
+        // Recupera las cuentas anteriores.
         List<Usuario> usuarios = cargarUsuarios();
 
-        // Rechaza nombres repetidos, sin distinguir mayúsculas y minúsculas.
+        // Rechaza nombres repetidos.
         for (Usuario usuario : usuarios) {
             if (usuario.getNombreUsuario().equalsIgnoreCase(
                     nuevoUsuario.getNombreUsuario())) {
@@ -92,18 +83,13 @@ public class UsuariosJson {
             }
         }
 
-        // Agrega el nuevo usuario a la lista en memoria.
         usuarios.add(nuevoUsuario);
-
-        // Crea la carpeta de datos si todavía no existe.
         Files.createDirectories(archivo.getParent());
 
-        // Abre el archivo para reemplazar su contenido y cierra el escritor
-        // automáticamente al terminar.
+        // Guarda la lista completa de cuentas.
         try (Writer escritor = Files.newBufferedWriter(
                 archivo, StandardCharsets.UTF_8)) {
 
-            // Convierte la lista completa a JSON y la escribe en el archivo.
             gson.toJson(usuarios, escritor);
         }
     }

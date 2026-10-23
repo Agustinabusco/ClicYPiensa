@@ -6,85 +6,65 @@ import modelo.Usuario;
 import persistencia.UsuariosJson;
 import vista.RegistroVista;
 
-// Coordina el registro entre la vista, el modelo y la persistencia.
+// Coordina la creación de cuentas.
 public class RegistroControlador {
 
     private final RegistroVista vista;
     private final UsuariosJson persistencia;
 
     public RegistroControlador(RegistroVista vista) {
-        // Guarda la vista recibida y prepara el acceso al archivo JSON.
         this.vista = vista;
         this.persistencia = new UsuariosJson();
 
-        // Ejecuta registrar() cuando se presiona el botón Registrar.
+        // Conecta el botón Registrar.
         vista.agregarAccionRegistrar(evento -> registrar());
     }
 
     private void registrar() {
-        // Obtiene los datos ingresados en el formulario.
+        // Obtiene los datos del formulario.
         String nombre = vista.getNombreUsuario();
         char[] contrasena = vista.getContrasena();
         String rol = vista.getRol();
 
         try {
-            // Comprueba que el nombre no esté vacío.
-            // return detiene el registro si falta el dato.
+            // Comprueba los campos obligatorios.
             if (nombre.isEmpty()) {
-                vista.mostrarMensaje(
-                    "Escribí un nombre de usuario."
-                );
+                vista.mostrarMensaje("Escribí un nombre de usuario.");
                 return;
             }
 
-            // Comprueba que se haya escrito una contraseña.
             if (contrasena.length == 0) {
-                vista.mostrarMensaje(
-                    "Escribí una contraseña."
-                );
+                vista.mostrarMensaje("Escribí una contraseña.");
                 return;
             }
 
-            // Rechaza cualquier rol que no sea Estudiante ni Docente.
+            // Comprueba que el rol sea uno de los disponibles.
             if (!"Estudiante".equals(rol)
                     && !"Docente".equals(rol)) {
-                vista.mostrarMensaje(
-                    "Seleccioná un rol válido."
-                );
+
+                vista.mostrarMensaje("Seleccioná un rol válido.");
                 return;
             }
 
-            // Crea el usuario; su constructor genera la sal y el hash.
-            Usuario usuario = new Usuario(
-                nombre,
-                rol,
-                contrasena
-            );
-
-            // Guarda la cuenta en JSON, comprobando que no esté repetida.
+            // Crea la cuenta y guarda su contraseña protegida.
+            Usuario usuario = new Usuario(nombre, rol, contrasena);
             persistencia.guardarUsuario(usuario);
 
-            // Confirma el registro y cierra el formulario.
-            vista.mostrarMensaje(
-                "Cuenta registrada correctamente."
-            );
-
+            vista.mostrarMensaje("Cuenta registrada correctamente.");
             vista.dispose();
 
         } catch (IllegalArgumentException error) {
-            // Muestra el motivo del rechazo, por ejemplo, un nombre repetido.
+            // Informa, por ejemplo, que el nombre ya existe.
             vista.mostrarMensaje(error.getMessage());
 
         } catch (IOException | IllegalStateException error) {
-            // Informa problemas al guardar o al procesar la contraseña.
             vista.mostrarMensaje(
                 "No se pudo registrar la cuenta: "
                 + error.getMessage()
             );
 
         } finally {
-            // Limpia la contraseña del arreglo y del campo,
-            // incluso si hubo un error o se ejecutó un return.
+            // Limpia la contraseña incluso si ocurre un error.
             Arrays.fill(contrasena, '\0');
             vista.limpiarContrasena();
         }

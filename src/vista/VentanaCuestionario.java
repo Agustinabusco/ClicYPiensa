@@ -10,7 +10,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-// Muestra las preguntas y las opciones de respuesta.
+// Muestra las preguntas y permite responder verdadero o falso.
 public class VentanaCuestionario extends JFrame {
 
     private final JLabel etiquetaProgreso;
@@ -21,23 +21,21 @@ public class VentanaCuestionario extends JFrame {
     public VentanaCuestionario() {
         super("Cuestionario — Clic y piensa");
 
-        // Configura el tamaño, el cierre y la ubicación.
+        // Configura la ventana.
         setSize(650, 300);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Prepara las etiquetas que actualizará el controlador.
+        // Prepara el progreso y el enunciado.
         etiquetaProgreso = new JLabel(
-            "Pregunta",
-            SwingConstants.CENTER
+            "Pregunta", SwingConstants.CENTER
         );
 
         etiquetaPregunta = new JLabel(
-            "",
-            SwingConstants.CENTER
+            "", SwingConstants.CENTER
         );
 
-        // Crea los botones y los agrupa en un panel.
+        // Crea las opciones de respuesta.
         botonVerdadero = new JButton("Verdadero");
         botonFalso = new JButton("Falso");
 
@@ -45,7 +43,7 @@ public class VentanaCuestionario extends JFrame {
         panelBotones.add(botonVerdadero);
         panelBotones.add(botonFalso);
 
-        // Organiza el contenido y agrega márgenes.
+        // Distribuye los componentes con márgenes.
         JPanel panelPrincipal = new JPanel(
             new BorderLayout(10, 10)
         );
@@ -61,7 +59,7 @@ public class VentanaCuestionario extends JFrame {
         setContentPane(panelPrincipal);
     }
 
-    // Actualiza el enunciado y el número de pregunta.
+    // Actualiza el enunciado y la cantidad de preguntas.
     public void mostrarPregunta(
             String enunciado,
             int numero,
@@ -71,15 +69,21 @@ public class VentanaCuestionario extends JFrame {
             "Pregunta " + numero + " de " + total
         );
 
-        // HTML permite distribuir un enunciado largo en varias líneas.
+        // Escapa símbolos para mostrarlos como texto dentro del HTML.
+        String texto = enunciado
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;");
+
+        // HTML permite mostrar el texto en varias líneas.
         etiquetaPregunta.setText(
             "<html><div style='text-align: center;'>"
-            + enunciado
+            + texto
             + "</div></html>"
         );
     }
 
-    // Permiten al controlador conectar las acciones de los botones.
+    // Conectan los botones con las acciones del controlador.
     public void agregarAccionVerdadero(ActionListener accion) {
         botonVerdadero.addActionListener(accion);
     }
@@ -88,7 +92,25 @@ public class VentanaCuestionario extends JFrame {
         botonFalso.addActionListener(accion);
     }
 
-    // Muestra el resultado enviado por el controlador.
+    // Permite elegir el formato de la calificación.
+    public boolean elegirNotaSobreDiez() {
+        String[] opciones = {"Porcentaje", "Nota sobre 10"};
+
+        int seleccion = JOptionPane.showOptionDialog(
+            this,
+            "¿Cómo querés ver la calificación?",
+            "Formato de calificación",
+            JOptionPane.DEFAULT_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            opciones,
+            opciones[0]
+        );
+
+        // Si cierra el diálogo, se utiliza porcentaje.
+        return seleccion == 1;
+    }
+
     public void mostrarMensaje(String mensaje) {
         JOptionPane.showMessageDialog(this, mensaje);
     }

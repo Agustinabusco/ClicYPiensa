@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-// Formulario para introducir los datos de una nueva cuenta.
+// Formulario para registrar una cuenta.
 public class RegistroVista extends JDialog {
 
     private final JTextField campoUsuario;
@@ -23,25 +23,22 @@ public class RegistroVista extends JDialog {
     private final JButton botonRegistrar;
 
     public RegistroVista(JFrame ventanaPadre) {
-        // Establece propietario, título y modalidad del diálogo.
-        // Mientras ese diálogo esté abierto, no se puede interactuar con su ventana principal.
+        // Mientras está abierto, bloquea su ventana principal.
         super(ventanaPadre, "Registrarse — Clic y piensa", true);
 
-        // Cierra el formulario sin terminar la aplicación.
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
-        // Crea los campos de usuario y contraseña.
+        // Crea los campos y las opciones de rol.
         campoUsuario = new JTextField(20);
         campoContrasena = new JPasswordField(20);
 
-        // Crea la lista desplegable con los roles disponibles.
         selectorRol = new JComboBox<>(
             new String[] {"Estudiante", "Docente"}
         );
 
         botonRegistrar = new JButton("Registrar");
 
-        // Distribuye las etiquetas y los campos en tres filas y dos columnas.
+        // Organiza los datos en tres filas y dos columnas.
         JPanel panelCampos = new JPanel(
             new GridLayout(3, 2, 10, 10)
         );
@@ -53,11 +50,10 @@ public class RegistroVista extends JDialog {
         panelCampos.add(new JLabel("Rol:"));
         panelCampos.add(selectorRol);
 
-        // Agrupa el botón en un panel.
         JPanel panelBotones = new JPanel();
         panelBotones.add(botonRegistrar);
 
-        // Prepara el contenedor principal con separaciones y márgenes.
+        // Prepara el contenedor con márgenes.
         JPanel panelPrincipal = new JPanel(
             new BorderLayout(10, 10)
         );
@@ -69,38 +65,34 @@ public class RegistroVista extends JDialog {
         panelPrincipal.add(panelCampos, BorderLayout.CENTER);
         panelPrincipal.add(panelBotones, BorderLayout.SOUTH);
 
-        // Establece el contenido, ajusta el tamaño y centra el formulario.
         setContentPane(panelPrincipal);
         pack();
         setLocationRelativeTo(ventanaPadre);
     }
 
-    // Devuelve el usuario sin espacios en los extremos.
+    // Permiten consultar los datos del formulario.
     public String getNombreUsuario() {
         return campoUsuario.getText().trim();
     }
 
-    // Devuelve la contraseña como arreglo de caracteres.
     public char[] getContrasena() {
         return campoContrasena.getPassword();
     }
 
-    // Obtiene la opción seleccionada y la convierte al tipo String.
     public String getRol() {
         return (String) selectorRol.getSelectedItem();
     }
 
-    // Permite al controlador conectar la acción del botón Registrar.
+    // Conecta el botón Registrar con el controlador.
     public void agregarAccionRegistrar(ActionListener accion) {
         botonRegistrar.addActionListener(accion);
     }
 
-    // Muestra los mensajes solicitados por el controlador.
+    // Muestra mensajes y permite limpiar la contraseña.
     public void mostrarMensaje(String mensaje) {
         JOptionPane.showMessageDialog(this, mensaje);
     }
 
-    // Vacía el campo de contraseña.
     public void limpiarContrasena() {
         campoContrasena.setText("");
     }
