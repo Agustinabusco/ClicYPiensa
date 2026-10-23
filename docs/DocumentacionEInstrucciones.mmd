@@ -1,0 +1,347 @@
+# Clic y piensa
+
+Autora: Agustina Busco  
+Unidad curricular: Programación 2  
+**Institución: CeRP del Suroeste  
+
+## Descripción del proyecto
+
+Clic y piensa es una aplicación de escritorio desarrollada en Java que permite responder un cuestionario de verdadero o falso sobre informática.
+
+El sistema permite registrar usuarios e iniciar sesión. Según el rol de la cuenta, se puede acceder al formulario docente para agregar preguntas o al cuestionario para responderlas.
+
+Al finalizar un cuestionario, se muestra la cantidad de aciertos y la calificación en el formato elegido. El intento se guarda en un archivo JSON.
+
+La aplicación funciona de manera local, sin servidor.
+
+## Objetivo
+
+Ofrecer una herramienta sencilla para evaluar conocimientos de informática mediante preguntas de verdadero o falso, con corrección automática y almacenamiento de los intentos realizados.
+
+## Funcionalidades
+
+- Registro de cuentas con nombre de usuario, contraseña y rol.
+- Comprobación de nombres de usuario repetidos.
+- Inicio de sesión mediante usuario y contraseña.
+- Acceso a diferentes pantallas según el rol.
+- Agregado de preguntas desde el formulario docente.
+- Resolución de preguntas de verdadero o falso.
+- Corrección automática.
+- Elección de la calificación como porcentaje o nota sobre 10.
+- Guardado de usuarios, preguntas adicionales e intentos en JSON.
+
+## Alcance de esta versión
+
+El sistema utiliza un único cuestionario compartido por las cuentas de la aplicación.
+
+Este cuestionario reúne:
+
+1. Las cuatro preguntas iniciales definidas en `Preguntas.java`.
+2. Las preguntas agregadas desde la pantalla docente y guardadas en JSON.
+
+No se crean cuestionarios separados por título o materia. Tampoco se incluyen códigos de acceso, funcionamiento en red ni una pantalla para consultar el historial de resultados.
+
+Los roles se seleccionan al registrar la cuenta. Esta versión no verifica institucionalmente quién se registra como docente.
+
+## Tecnologías utilizadas
+
+- Java: lenguaje de programación.
+- Swing: creación de la interfaz gráfica.
+- Gson: conversión entre objetos Java y archivos JSON.
+- JSON: almacenamiento local de los datos.
+- Visual Studio Code: entorno utilizado para el desarrollo.
+
+## Requisitos para ejecutar el proyecto
+
+- JDK compatible con Java 11 o posterior.
+- Biblioteca Gson incluida en la carpeta `lib`.
+- Configuración del proyecto que permita reconocer Gson.
+- Para trabajar desde VS Code, soporte de Java instalado.
+
+La aplicación debe ejecutarse desde la carpeta principal del proyecto, ya que las rutas de los archivos de datos son relativas a esa ubicación.
+
+## Organización del proyecto
+
+### Archivo principal
+
+- `ClicYPiensa.java`: contiene el método `main`, crea la ventana inicial y conecta su controlador.
+
+### Paquete modelo
+
+- `Usuario.java`: representa una cuenta y permite comprobar su contraseña.
+- `Pregunta.java`: representa un enunciado de verdadero o falso y comprueba una respuesta.
+- `Preguntas.java`: prepara las cuatro preguntas iniciales.
+- `Resultado.java`: representa un intento con el usuario, las respuestas, los aciertos y el total de preguntas.
+- `EstrategiaCalificacion.java`: define la operación común de las formas de calificar.
+- `CalificacionPorcentaje.java`: calcula la calificación como porcentaje.
+- `CalificacionSobreDiez.java`: calcula la calificación sobre 10.
+
+### Paquete vista
+
+- `VentanaInicio.java`: muestra los botones Ingresar y Registrarse.
+- `VentanaIngreso.java`: solicita las credenciales.
+- `RegistroVista.java`: solicita los datos de una nueva cuenta.
+- `VentanaDocente.java`: permite escribir preguntas y seleccionar su respuesta correcta.
+- `VentanaCuestionario.java`: muestra las preguntas, recibe las respuestas y permite elegir el formato de calificación.
+
+### Paquete controlador
+
+- `ControladorInicio.java`: conecta los botones iniciales con los formularios.
+- `RegistroControlador.java`: valida y coordina el registro.
+- `IngresoControlador.java`: comprueba las credenciales y abre la pantalla correspondiente al rol.
+- `DocenteControlador.java`: valida y coordina el guardado de nuevas preguntas.
+- `CuestionarioControlador.java`: coordina el recorrido de preguntas, cuenta los aciertos y guarda el intento.
+
+### Paquete persistencia
+
+- `UsuariosJson.java`: lee y guarda las cuentas.
+- `ResultadosJson.java`: lee y guarda los intentos.
+- `PreguntasAdicionalesJson.java`: lee y guarda las preguntas agregadas desde la aplicación.
+
+### Otras carpetas
+
+- `datos`: contiene los archivos JSON.
+- `lib`: contiene la biblioteca Gson.
+- `.vscode`: contiene la configuración de VS Code, si está incluida.
+- `bin`: puede contener los archivos compilados generados por el entorno.
+
+## Organización MVC
+
+El proyecto utiliza el patrón Modelo-Vista-Controlador.
+
+### Modelo
+
+Representa los datos y las operaciones del dominio. Por ejemplo, `Pregunta` almacena el enunciado y comprueba si una respuesta es correcta.
+
+### Vista
+
+Construye las ventanas y muestra información. Permite obtener los datos escritos y conectar acciones a los botones.
+
+### Controlador
+
+Recibe las acciones del usuario y coordina las vistas, el modelo y la persistencia.
+
+Por ejemplo, cuando el estudiante presiona Verdadero, el controlador recibe esa elección, consulta a la pregunta si es correcta y actualiza el recorrido.
+
+El acceso a archivos se concentra en el paquete `persistencia`.
+
+## Patrón Strategy
+
+Se utiliza Strategy para elegir cómo expresar la calificación final.
+
+La interfaz `EstrategiaCalificacion` define:
+
+```java
+String calcular(int aciertos, int totalPreguntas);
+```
+
+Las clases que la implementan son:
+
+- `CalificacionPorcentaje`.
+- `CalificacionSobreDiez`.
+
+El usuario elige el formato antes de responder. El controlador guarda la estrategia seleccionada y utiliza su método al finalizar.
+
+Ejemplo con tres aciertos de cuatro:
+
+- Porcentaje: 75 %.
+- Nota sobre 10: 7,5.
+
+La elección cambia la escala utilizada para mostrar la calificación. No cambia la corrección de las respuestas ni los datos del intento que se guardan.
+
+## Polimorfismo
+
+El controlador declara un atributo del tipo de la interfaz:
+
+```java
+private final EstrategiaCalificacion estrategia;
+```
+
+Ese atributo puede contener un objeto `CalificacionPorcentaje` o un objeto `CalificacionSobreDiez`.
+
+La llamada es la misma en ambos casos:
+
+```java
+estrategia.calcular(aciertos, preguntas.size());
+```
+
+Se ejecuta la implementación correspondiente al objeto seleccionado. Esto demuestra polimorfismo mediante una interfaz.
+
+## Herencia
+
+Las ventanas reutilizan funcionalidades de Swing mediante herencia.
+
+- `VentanaInicio`, `VentanaDocente` y `VentanaCuestionario` heredan de `JFrame`.
+- `VentanaIngreso` y `RegistroVista` heredan de `JDialog`.
+
+Esto permite utilizar métodos como `setVisible`, `setSize`, `setLocationRelativeTo` y `dispose`.
+
+## Protección de contraseñas
+
+Las contraseñas no se guardan como texto original.
+
+Al registrar una cuenta:
+
+1. Se genera una sal aleatoria de 16 bytes.
+2. Se calcula un hash utilizando PBKDF2 con HMAC-SHA256.
+3. El cálculo utiliza 600000 iteraciones y produce una salida de 256 bits.
+4. La sal y el hash se representan en Base64 para guardarlos en JSON.
+
+Al iniciar sesión, se calcula nuevamente el hash con la contraseña ingresada y la sal de la cuenta. Luego se compara con el hash almacenado.
+
+Base64 representa los bytes como texto; no es el mecanismo que protege la contraseña.
+
+Las cuentas antiguas que no tengan sal y hash no pueden iniciar sesión con esta implementación.
+
+## Archivos de datos
+
+### usuarios.json
+
+Guarda:
+
+- Nombre de usuario.
+- Rol.
+- Sal.
+- Hash de la contraseña.
+
+### preguntas_adicionales.json
+
+Guarda las preguntas agregadas desde la pantalla docente:
+
+- Enunciado.
+- Respuesta correcta.
+
+Las cuatro preguntas iniciales permanecen en `Preguntas.java`.
+
+### resultados.json
+
+Guarda cada intento con:
+
+- Nombre del usuario.
+- Respuestas elegidas.
+- Cantidad de aciertos.
+- Total de preguntas.
+
+Las respuestas se almacenan en el mismo orden que las preguntas presentadas.
+
+El porcentaje y la nota sobre 10 se calculan al finalizar; no se guardan como campos separados.
+
+Los intentos no incluyen fecha ni una copia de los enunciados. Si se modifican las preguntas originales, los intentos anteriores mantienen sus datos, pero no conservan el texto de las preguntas que se respondieron.
+
+Los archivos necesarios se crean al guardar datos. No es necesario crearlos manualmente.
+
+## Instrucciones de ejecución
+
+1. Abrir la carpeta principal del proyecto en VS Code.
+2. Comprobar que Java y la biblioteca Gson estén reconocidos.
+3. Guardar los archivos.
+4. Abrir `src/ClicYPiensa.java`.
+5. Ejecutar el método `main` mediante la opción Run de Java.
+
+La interfaz se crea mediante `SwingUtilities.invokeLater`, para trabajar en el hilo de eventos de Swing.
+
+## Instrucciones de uso
+
+### Registrar una cuenta
+
+1. Presionar Registrarse.
+2. Escribir un nombre de usuario.
+3. Escribir una contraseña.
+4. Seleccionar Estudiante o Docente.
+5. Presionar Registrar.
+
+El sistema comprueba que los campos estén completos y que el nombre no esté registrado.
+
+El registro crea la cuenta. Después se debe utilizar Ingresar para acceder a su pantalla.
+
+### Ingresar
+
+1. Presionar Ingresar.
+2. Escribir el nombre de usuario y la contraseña.
+3. Presionar Ingresar en el formulario.
+
+La comparación del nombre no distingue entre mayúsculas y minúsculas.
+
+### Agregar preguntas como docente
+
+1. Ingresar con una cuenta de rol Docente.
+2. Escribir el enunciado.
+3. Seleccionar Verdadero o Falso como respuesta correcta.
+4. Presionar Guardar pregunta.
+5. Repetir el procedimiento para agregar otras.
+
+Cada pregunta se guarda junto con las anteriores.
+
+Las preguntas nuevas estarán disponibles en los cuestionarios que se inicien después del guardado. Un cuestionario que ya está abierto conserva la lista que cargó al comenzar.
+
+### Responder como estudiante
+
+1. Ingresar con una cuenta de rol Estudiante.
+2. Elegir porcentaje o nota sobre 10.
+3. Responder cada pregunta con Verdadero o Falso.
+4. Consultar la calificación final.
+5. Comprobar en el mensaje si el intento se guardó correctamente.
+
+Si se cierra el diálogo de elección de formato, se utiliza porcentaje.
+
+Solo se guardan los intentos completos. Cerrar la ventana antes de finalizar no guarda un intento parcial.
+
+## Modificar preguntas desde el código
+
+Las preguntas originales se encuentran en:
+
+`src/modelo/Preguntas.java`
+
+Para modificar una pregunta, cambiar el texto o su valor `true` o `false`.
+
+Para agregar otra, colocar un bloque como este antes de `return preguntas;`:
+
+```java
+preguntas.add(new Pregunta(
+    "Java permite utilizar clases y objetos.",
+    true
+));
+```
+
+Para eliminar una, borrar su bloque completo.
+
+Después de modificar el código, guardar y volver a ejecutar el programa.
+
+Las preguntas agregadas desde la aplicación se encuentran en `datos/preguntas_adicionales.json`. No aparecen dentro de `Preguntas.java`.
+
+## Manejo de errores
+
+La aplicación muestra mensaje cuando:
+
+- Faltan datos en el registro o ingreso.
+- El nombre de usuario ya existe.
+- Las credenciales no coinciden.
+- Se intenta guardar una pregunta sin enunciado.
+- Ocurre un problema al leer o guardar archivos.
+- Un archivo JSON tiene un formato inválido.
+
+Si no pueden cargarse las preguntas adicionales, el cuestionario utiliza las cuatro originales y muestra una advertencia.
+
+Si falla el guardado del resultado, se muestra igualmente la calificación y se informa que el intento no pudo guardarse.
+
+## Comprobaciones básicas
+
+- Registrar una cuenta y volver a ingresar después de reiniciar.
+- Intentar registrar un nombre repetido.
+- Ingresar con una contraseña incorrecta.
+- Registrar e ingresar con ambos roles.
+- Agregar una pregunta como docente.
+- Comprobar que la nueva pregunta aparece al iniciar otro cuestionario.
+- Completar el cuestionario con ambas formas de calificación.
+- Realizar dos intentos y comprobar que ambos quedan guardados.
+- Reiniciar la aplicación y comprobar que las preguntas adicionales se conservan.
+
+## Posibles mejoras futuras
+
+- Crear cuestionarios separados con título y materia.
+- Editar y eliminar preguntas desde la interfaz.
+- Consultar el historial de intentos desde la aplicación.
+- Mostrar las respuestas incorrectas al finalizar.
+- Guardar la fecha y los enunciados correspondientes a cada intento.
+- Incorporar un sistema de autorización para las cuentas docentes.
+- Incorporar funcionamiento en red.
